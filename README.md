@@ -13,9 +13,9 @@ Experiments with the `k`-means transformer.
 Assuming CUDA is properly setup on the machine, we will be using python version 3.11
 
 ```
-> cd spartan
-> conda create -n spartan
-> conda activate spartan
+> cd kmeans-trf
+> conda create -n kmt
+> conda activate kmt
 > conda install python=3.11 pip>25.0
 > conda install cudatoolkit -c anaconda  # <== OPTIONAL: if we have access to a GPU
 > pip install -r requirements.txt
