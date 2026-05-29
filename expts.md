@@ -40,25 +40,6 @@ for TRIAL in {1..10}; do
 done
 ```
 
-Plotting for Figure 9a
-
-
-```
-python plot_train_id_gen.py -I runs \
-  -R "n=512_N=512_k=6_d=4_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=*_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
-  -O results -S 'l' -V "e:L" --numeric -T "Loss temp" -M 1.5 --logy -C "fig9a" \
-  --quantile 25 --drop_step_zero --inv_hp_val  --nlegendcols 1 --xticks_steps 5000 --alt_plot
-```
-
-Plotting for Figure 9b
-
-
-```
-python plot_train_id_gen.py -I runs \
-  -R "n=512_N=512_k=6_d=32_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=*_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
-  -O results -S 'l' -V "e:L" --numeric -T "Loss temp" -M 1.5 --logy -C "fig9b" \
-  --quantile 25 --drop_step_zero --inv_hp_val  --nlegendcols 1 --xticks_steps 5000 --alt_plot
-```
 
 Training runs for Figure 10a
 
@@ -70,16 +51,6 @@ for TRIAL in {1..10}; do
 done
 ```
 
-Plotting for Figure 10a
-
-```
-python plot_train_id_gen.py -I runs \
-  -R "n=512_N=512_k=*_d=32_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=10.0_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
-  -O results -S 'k' -V "e:L" --numeric -T "nclusters" -M 1.5 --logy -C "fig10a" \
-  --quantile 25 --drop_step_zero --hp_val_int --nlegendcols 1 --xticks_steps 5000 --alt_plot
-```
-
-
 Training runs for Figure 10b
 
 ```
@@ -90,17 +61,11 @@ for TRIAL in {1..10}; do
 done
 ```
 
-Plotting for Figure 10a
-
-```
-python plot_train_id_gen.py -I runs \
-  -R "n=512_N=512_k=6_d=*_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=10.0_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
-  -O results -S 'd' -V "e:L" --numeric -T "ndims" -M 1.5 --logy -C "fig10b" \
-  --quantile 25 --drop_step_zero --hp_val_int --nlegendcols 1 --xticks_steps 5000 --alt_plot
-```
-
 ## Main paper plots
 
+### Figure 3 (and Figure 8)
+
+See notebook `numerical_validation.ipynb`
 
 ### Figure 4
 
@@ -142,7 +107,55 @@ python plot_eval_ood_gen.py -I runs \
 
 ### Figure 5
 
+See notebook `viz_weights.ipynb`.
+
 ### Figure 6
+
+See notebook `viz_attn_maps.ipynb`.
+
+
+## Appendix plots
+
+### Figure 9
+
+Plotting for Figure 9a
+
+```
+python plot_train_id_gen.py -I runs \
+  -R "n=512_N=512_k=6_d=4_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=*_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
+  -O results -S 'l' -V "e:L" --numeric -T "Loss temp" -M 1.5 --logy -C "fig9a" \
+  --quantile 25 --drop_step_zero --inv_hp_val  --nlegendcols 1 --xticks_steps 5000 --alt_plot
+```
+
+Plotting for Figure 9b
+
+```
+python plot_train_id_gen.py -I runs \
+  -R "n=512_N=512_k=6_d=32_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=*_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
+  -O results -S 'l' -V "e:L" --numeric -T "Loss temp" -M 1.5 --logy -C "fig9b" \
+  --quantile 25 --drop_step_zero --inv_hp_val  --nlegendcols 1 --xticks_steps 5000 --alt_plot
+```
+
+### Figure 10
+
+Plotting for Figure 10a
+
+```
+python plot_train_id_gen.py -I runs \
+  -R "n=512_N=512_k=*_d=32_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=10.0_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
+  -O results -S 'k' -V "e:L" --numeric -T "nclusters" -M 1.5 --logy -C "fig10a" \
+  --quantile 25 --drop_step_zero --hp_val_int --nlegendcols 1 --xticks_steps 5000 --alt_plot
+```
+
+Plotting for Figure 10b
+
+```
+python plot_train_id_gen.py -I runs \
+  -R "n=512_N=512_k=6_d=*_D=normal_s=0.1_em=True_es=True_sdb=True_e=*_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=10.0_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10.csv" \
+  -O results -S 'd' -V "e:L" --numeric -T "ndims" -M 1.5 --logy -C "fig10b" \
+  --quantile 25 --drop_step_zero --hp_val_int --nlegendcols 1 --xticks_steps 5000 --alt_plot
+```
+
 
 ### Table 1 and Figure 11
 
