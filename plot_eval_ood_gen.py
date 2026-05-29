@@ -592,7 +592,7 @@ if __name__ == '__main__':
         )
         ood_val_task_dict[seed] = [task_gen.sample_batch(
           task_args['bsz'], same_dist_batch=task_args['sdb']
-        )] # for _ in range(task_args['val_nbatches'])]
+        ) for _ in range(task_args['val_nbatches'])]
       axs[cidx].set_title(f"Dist:{dist}")
       _, drow = process_ood_task(
         ood_val_task_dict, args.niters,
