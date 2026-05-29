@@ -144,7 +144,15 @@ python plot_eval_ood_gen.py -I runs \
 
 ### Figure 6
 
-### Table 1
+### Table 1 and Figure 11
+
+The following command creates Figure 11 and also outputs a table corresponding to Table 1:
+```
+plot_eval_ood_gen.py -I runs \
+  -R "n=512_N=512_k=10_d=32_D=normal_s=0.1_em=True_es=True_sdb=True_e=onehot_q=1_A=softmax_a=1.0_p=0.01_L=softmax_g=False_l=10.0_E=*_b=32_r=0.01_C=0.5_P=5.0_T=10000_t=50_B=10_last.pt" \
+  -O results -V "e:L" -M 2.7 -P "tab1" --niters 20 --opmode varfam \
+  --nlegendcols 1 --seed 'E' --init_scheme random --quantile 0 --skip_rembed_false --alt_plot
+```
 
 ### Table 2
 

@@ -190,7 +190,8 @@ def process_ood_task(
     label="Lloyd's", linewidth=1
   )
   ax.fill_between(xx, yylb, yyub, color='xkcd:almost black', alpha=0.2)
-  print(f"Lloyd's iteration objectives plotted")
+  print(f"Lloyd's iteration objectives plotted:")
+
 
   # for all models in optdf, run model and plot results
   for v1, vhpdf in optdf.groupby(vhp):
@@ -214,7 +215,7 @@ def process_ood_task(
     )
     ax.fill_between(xx, myylb, myyub, color=color, alpha=0.1)
 
-  return (yy, yylb, yyub)
+  return (yy, yylb, yyub), (yy[0], yy[-1], myy[0], myy[-1])
 
 def add_grids_and_save(figobj, axes, out_file):
   print('adding grids to figure')
@@ -550,4 +551,45 @@ if __name__ == '__main__':
 
   # - Distribution changes cauchy/gumbel/laplace/lognormal
   if args.opmode == opmodes[2]:
-    raise NotImplementedError
+    dists = DMAP.keys()
+    fig, axs = plt.subplots(
+      1, len(dists), figsize=(len(dists) * mult, mult),
+      sharex=True,
+      sharey=("row" if args.sharey else False),
+    )
+    print('='*60)
+    print('Processing out-of-distribution tasks -- distribution family')
+    print('-'*60)
+    drows = []
+    for cidx, dist in enumerate(dists):
+      print(f"Processing distribution: {dist}")
+      # Instantiate task generator and obtain validation set for each seed
+      ood_val_task_dict = {}
+      for seed in SEEDS:
+        set_seed(seed)
+        task_gen = ClusteringTasks(
+          task_args['nclusters'], task_args['nclusters'],
+          task_args['ndims'],
+          task_args['nlb'], task_args['nub'],
+          [dist],
+          scale=task_args['scale'],
+          equal_mix=task_args['em'], equal_scales=task_args['es'],
+        )
+        ood_val_task_dict[seed] = [task_gen.sample_batch(
+          task_args['bsz'], same_dist_batch=task_args['sdb']
+        ) for _ in range(task_args['val_nbatches'])]
+      axs[cidx].set_title(f"Dist:{dist}")
+      _, drow = process_ood_task(
+        ood_val_task_dict, args.niters,
+        axs[cidx], optdf,
+        color_dict,
+        vhps[0], lossact, args.seed,
+        reset, args.quantile
+      )
+      drows += [(dist, *np.array(drow).tolist())]
+      axs[cidx].set_xlabel("# clustering steps", fontsize=10)
+      print(f"Dist: {dist} completed")
+    axs[0].set_ylabel(f"avg log-kmeans-obj", fontsize=10)
+    axs[-1].legend(ncol=args.nlegendcols, loc='best', fontsize=8)
+    add_grids_and_save(fig, axs, ofile)
+    print(pd.DataFrame(drows))
