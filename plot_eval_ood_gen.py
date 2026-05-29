@@ -7,6 +7,7 @@ import sys
 import random
 import glob
 from itertools import product
+from typing import cast
 
 import numpy as np
 np.set_printoptions(precision=4)
@@ -14,6 +15,7 @@ import pandas as pd
 pd.set_option('display.precision', 4)
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 
 import torch
 torch.set_printoptions(precision=4)
@@ -43,7 +45,7 @@ def gnzkpp(X, c, k, sample):
   for i in range(k - 1):
     C = torch.stack(clist)
     sqdist = torch.square(torch.cdist(X, C))
-    minsqdist, _ = sqdist.min(axis=1)
+    minsqdist, _ = sqdist.min(dim=1)
     weights = minsqdist / minsqdist.sum()
     new_cidx = (
       Categorical(probs=weights).sample() if sample
@@ -153,9 +155,9 @@ def get_scratch(
 
 
 def process_ood_task(
-    task_dict: dict[int, list[(torch.Tensor, torch.Tensor)]],
+    task_dict: dict[int, list[tuple[torch.Tensor, torch.Tensor]]],
     niters: int,
-    ax: matplotlib.axes.Axes,
+    ax: Axes,
     optdf: pd.DataFrame,
     color_map: dict[str, str],
     vhp: str,
@@ -194,13 +196,14 @@ def process_ood_task(
 
 
   # for all models in optdf, run model and plot results
+  ret_list = []
   for v1, vhpdf in optdf.groupby(vhp):
     label = label_gen(v1, lossact, alt=args.alt_plot)
     color = color_map[label]
     print(v1, lossact, reset, color, label)
-    model_obj_dict = {row[seedcolname]: torch.hstack([
-      process_model(BXX, BCC, row['fname'], reset=reset, niters=niters)
-      for BXX, BCC in task_dict[row[seedcolname]]
+    model_obj_dict = {int(row[seedcolname]): torch.hstack([
+      process_model(BXX, BCC, str(row['fname']), reset=reset, niters=niters)
+      for BXX, BCC in task_dict[int(row[seedcolname])]
     ]) for idx, row in vhpdf.iterrows()}
     myyy = torch.stack([
       torch.mean(torch.log(model_objs), dim=1).to('cpu')
@@ -214,8 +217,12 @@ def process_ood_task(
       label=label, linewidth=1
     )
     ax.fill_between(xx, myylb, myyub, color=color, alpha=0.1)
+    ret_list += [[
+      label, yy[0].item(), yy[-1].item(),
+      myy[0].item(), myy[-1].item()
+    ]]
 
-  return (yy, yylb, yyub), (yy[0], yy[-1], myy[0], myy[-1])
+  return (yy, yylb, yyub), ret_list
 
 def add_grids_and_save(figobj, axes, out_file):
   print('adding grids to figure')
@@ -378,6 +385,13 @@ if __name__ == '__main__':
     print(f"[Seed {seed}] All validation tasks and task configurations match!!")
     id_val_task_dict[seed] = id_val_tasks
 
+  # Ensure task_args was initialized (i.e., at least one seed was processed)
+  if task_args is None:
+    raise ValueError(
+      f"No valid checkpoint files found matching the seed column '{args.seed}'. "
+      "Ensure the input directory contains checkpoint files with the expected format."
+    )
+
   tmp_dict = {
     k: seed_lloyds(v, args.init_scheme)
     for k, v in id_val_task_dict.items()
@@ -444,8 +458,8 @@ if __name__ == '__main__':
       'xkcd:salmon',
       'xkcd:dark orange',
     ]
-    v1vals = np.sort(sdf[vhps[0]].unique())
-    v2vals = np.sort(sdf[vhps[1]].unique())
+    v1vals = sorted(sdf[vhps[0]].unique())
+    v2vals = sorted(sdf[vhps[1]].unique())
     color_dict = {
       label_gen(e, r, alt=args.alt_plot): mcolor_list[idx]
       for idx, (e, r) in enumerate(product(v1vals, v2vals))
@@ -454,13 +468,14 @@ if __name__ == '__main__':
     for cidx, r in enumerate(reset):
       # - run all HP models on all validation tasks without scratch reset
       # - run all HP models on all validation tasks with scratch reset
-      for (v1, v2), vhpdf in sdf.groupby(vhps):
+      for group_key, vhpdf in sdf.groupby(vhps):
+        v1, v2 = cast(tuple, group_key)
         label = label_gen(v1, v2, alt=args.alt_plot)
         color = color_dict[label]
         print(r, v1, v2, label, color)
-        model_obj_dict = {row[args.seed]: torch.hstack([
-          process_model(BXX, BCC, row['fname'], reset=r, niters=args.niters)
-          for BXX, BCC in id_val_task_dict[row[args.seed]]
+        model_obj_dict = {int(row[args.seed]): torch.hstack([
+          process_model(BXX, BCC, str(row['fname']), reset=r, niters=args.niters)
+          for BXX, BCC in id_val_task_dict[int(row[args.seed])]
         ]) for idx, row in vhpdf.iterrows()}
         myyy = torch.stack([
           torch.mean(torch.log(model_objs), dim=1).to('cpu')
@@ -485,7 +500,7 @@ if __name__ == '__main__':
     add_grids_and_save(fig, msaxs, ofile)
 
   # eval on out-of-distribution validation tasks vs Lloyd's
-  optdf = sdf[sdf[vhps[1]] == lossact]
+  optdf = pd.DataFrame(sdf[sdf[vhps[1]] == lossact])
   print(f"Found configs of {lossact}: {optdf.shape}")
   reset = True
   mcolor_list = [
@@ -497,7 +512,7 @@ if __name__ == '__main__':
     'xkcd:peacock blue',
     'xkcd:dark orange',
   ]
-  v1vals = np.sort(optdf[vhps[0]].unique())
+  v1vals = sorted(optdf[vhps[0]].unique())  # type: ignore[attr-defined]
   color_dict = {
     label_gen(e, lossact, alt=args.alt_plot): mcolor_list[idx]
     for idx, e in enumerate(v1vals)
@@ -577,7 +592,7 @@ if __name__ == '__main__':
         )
         ood_val_task_dict[seed] = [task_gen.sample_batch(
           task_args['bsz'], same_dist_batch=task_args['sdb']
-        ) for _ in range(task_args['val_nbatches'])]
+        )] # for _ in range(task_args['val_nbatches'])]
       axs[cidx].set_title(f"Dist:{dist}")
       _, drow = process_ood_task(
         ood_val_task_dict, args.niters,
@@ -586,7 +601,7 @@ if __name__ == '__main__':
         vhps[0], lossact, args.seed,
         reset, args.quantile
       )
-      drows += [(dist, *np.array(drow).tolist())]
+      drows += [(dist, *dr) for dr in drow]
       axs[cidx].set_xlabel("# clustering steps", fontsize=10)
       print(f"Dist: {dist} completed")
     axs[0].set_ylabel(f"avg log-kmeans-obj", fontsize=10)
