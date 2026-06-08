@@ -2,7 +2,7 @@
 
 <div align="center">
 
-### Kenneth L. Clarkson<sup>🏢</sup> · Lior Horesh<sup>🏢</sup> · Takuya Ito<sup>🏢</sup> · Charlotte Park<sup>🎓</sup> · Parikshit Ram<sup>🏢</sup>
+#### Kenneth L. Clarkson<sup>🏢</sup> · Lior Horesh<sup>🏢</sup> · Takuya Ito<sup>🏢</sup> · Charlotte Park<sup>🎓</sup> · Parikshit Ram<sup>🏢</sup>
 
 <sub><sup>🏢</sup> <strong>IBM Research</strong> &nbsp;&nbsp; <sup>🎓</sup> <strong>EECS, MIT</strong></sub>
 
@@ -10,12 +10,9 @@
 
 <div align="center">
 
-📄 **[Read the Paper (PDF)](assets/Clarkson_2026_Transformer_Clustering.pdf)** 📄
+📄 **[Read the ICML camera-ready (PDF)](assets/Clarkson_2026_Transformer_Clustering.pdf)** 📄
 
-[![arXiv](https://img.shields.io/badge/arXiv-2506.19125-b31b1b.svg)](https://arxiv.org/abs/2506.19125)
-
-### 🚀 Preliminary version on arXiv
-## **[arXiv:2506.19125](https://arxiv.org/abs/2506.19125)**
+🚀 Preliminary version on arXiv [![arXiv](https://img.shields.io/badge/arXiv-2506.19125-b31b1b.svg)](https://arxiv.org/abs/2506.19125)
 
 </div>
 
@@ -33,6 +30,10 @@ Although transformers are most commonly optimized as statistical sequence models
   <p><em>Overview</em></p>
 </div>
 
+<div align="center">
+  <img src="assets/numerical-validation.png" alt="Numerical Validation" width="800"/>
+  <p><em>Numerical Validation</em></p>
+</div>
 
 
 
