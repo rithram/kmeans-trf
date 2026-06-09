@@ -10,7 +10,11 @@
 
 <div align="center">
 
-📄 **[ICML camera-ready (PDF)](assets/Clarkson_2026_Transformer_Clustering.pdf)** (🚀 Preliminary version [![arXiv](https://img.shields.io/badge/arXiv-2506.19125-b31b1b.svg)](https://arxiv.org/abs/2506.19125))
+📄 **[ICML camera-ready (PDF)](assets/Clarkson_2026_Transformer_Clustering.pdf)**
+
+Preliminary version:
+
+[![arXiv](https://img.shields.io/badge/arXiv-2506.19125-b31b1b.svg)](https://arxiv.org/abs/2506.19125)
 
 </div>
 
