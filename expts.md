@@ -65,7 +65,7 @@ done
 
 ### Figure 3 (and Figure 8)
 
-See notebook `numerical_validation.ipynb`
+See notebook [`numerical_validation.ipynb`](numerical_validation.ipynb)
 
 ### Figure 4
 
@@ -107,11 +107,11 @@ python plot_eval_ood_gen.py -I runs \
 
 ### Figure 5
 
-See notebook `viz_weights.ipynb`.
+See notebook [`viz_weights.ipynb`](viz_weights.ipynb).
 
 ### Figure 6
 
-See notebook `viz_attn_maps.ipynb`.
+See notebook [`viz_attn_maps.ipynb`](viz_attn_maps.ipynb).
 
 
 ## Appendix plots
