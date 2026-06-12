@@ -19,7 +19,7 @@ Preliminary version:
 </div>
 
 <div align="center">
-  <img src="assets/klic-poster.png" alt="ICML 2026 Poster" width="400"/>
+  <img src="assets/klic-poster.jpg" alt="ICML 2026 Poster" width="400"/>
 </div>
 
 
