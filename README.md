@@ -1,4 +1,28 @@
-# Transformer Circuits Can Realize Clustering Algorithms
+# Transformers as Clustering Algorithms
+
+## Table of Contents
+
+- [Environment Setup](#environment-setup)
+- [Transformer Circuits Can Realize Clustering Algorithms](#transformer-circuits-can-realize-clustering-algorithms)
+- [Leaner Transformers Can Easily Learn to Cluster](#leaner-transformers-can-easily-learn-to-cluster)
+
+---
+
+## Environment setup
+
+Assuming CUDA is properly setup on the machine, we will be using python version 3.13
+
+```bash
+cd kmeans-trf
+conda create -n kmt
+conda activate kmt
+conda install python=3.13 pip>25.0
+conda install cudatoolkit -c anaconda  # <== OPTIONAL: if we have access to a GPU
+pip install -r requirements.txt
+```
+
+
+## Transformer Circuits Can Realize Clustering Algorithms
 
 <div align="center">
 
@@ -26,7 +50,7 @@ Preliminary version:
 **Abstract.**
 Although transformers are most commonly optimized as statistical sequence models, it is unclear to what extent they can implement and learn exact algorithmic computations. Here, we specify a transformer implementation from first principles that executes a fundamental and widely used method for $k$-means clustering: Lloyd's algorithm. We theoretically prove and empirically demonstrate that this implementation of a transformer architecture, which we term the $k$-_means transformer_, exactly implements Lloyd's algorithm for $k$-means clustering using the standard circuit mechanisms of modern transformers: attention block, residual connections, and feed-forward block. In learning experiments, we find that training this base architecture on $k$-means clustering yields a generalizable clustering algorithm that surpasses Lloyd's algorithm in terms of clustering quality. Finally, we demonstrate that interpretable alterations (e.g., inclusion of layer normalizations) to this architecture yields diverse and novel variants of clustering algorithms, including soft $k$-means, spherical $k$-means, trimmed $k$-means. Overall, our results show that transformer circuit mechanisms can instantiate exact algorithmic routines for clustering, while simultaneously providing an effective learnable model.
 
-## Main Results
+### Main Results
 
 <div align="center">
   <img src="assets/klic-overview.png" alt="KLIC Overview" width="800"/>
@@ -51,26 +75,14 @@ Although transformers are most commonly optimized as statistical sequence models
 </p>
 
 
-## Empirical Evaluations
+### Empirical Evaluations
 
-### Environment setup
 
-Assuming CUDA is properly setup on the machine, we will be using python version 3.13
-
-```bash
-cd kmeans-trf
-conda create -n kmt
-conda activate kmt
-conda install python=3.13 pip>25.0
-conda install cudatoolkit -c anaconda  # <== OPTIONAL: if we have access to a GPU
-pip install -r requirements.txt
-```
-
-### Experimental details
+#### Experimental details
 
 The details on running the scripts for the training and evaluation is in [expts.md](./expts.md).
 
-## Citing this work
+### Citing this work
 
 ```
 @inproceedings{clarkson2026transformer,
@@ -80,3 +92,26 @@ The details on running the scripts for the training and evaluation is in [expts.
   year={2026}
 }
 ```
+
+---
+
+## Leaner Transformers
+
+> 🚧 **Under Construction** 🚧
+
+
+<div align="center">
+
+#### Charlotte Park<sup>🎓</sup> · Kenneth L. Clarkson<sup>🏢</sup> · Lior Horesh<sup>🏢</sup> · Takuya Ito<sup>🏢</sup> · Parikshit Ram<sup>🏢</sup>
+
+<sub><sup>🏢</sup> <strong>IBM Research</strong> &nbsp;&nbsp; <sup>🎓</sup> <strong>EECS, MIT</strong></sub>
+
+</div>
+
+<div align="center">
+
+📄 **[NeurIPS preprint (PDF)](assets/Clarkson_2026_Leaner_Transformer.pdf)**
+
+**Abstract.**
+Transformers have in-context learning capabilities, where some known learning algorithms can be executed in the forward pass through the model. Recent work shows that transformers can exactly perform Lloyd's algorithm for $k$-means clustering with $n$ points in $d$ dimensions with an embedding size $\demb = d+k$ (thus, requiring attention projection matrices of size $(d+k)^2$). In this work, we build upon this result in the following ways: First, we present an equally expressive but smaller transformer that executes Lloyd's algorithm with embedding size $\demb = (d + \lceil\log_2 k\rceil)$. Next, we train these transformers to learn the clustering algorithms given a distribution of clustering tasks, and theoretically characterize and empirically validate the factors affecting the convergence and in-distribution generalization of learning algorithms based on stochastic gradients.
+Finally, we probe the general clustering abilities of these learned algorithms (in the form of transformers), and try to understand situations where they succeed and fail.
