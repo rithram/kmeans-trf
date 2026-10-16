@@ -110,7 +110,11 @@ The details on running the scripts for the training and evaluation is in [expts.
 
 <div align="center">
 
-📄 **[NeurIPS preprint (PDF)](assets/Clarkson_2026_Leaner_Transformer.pdf)**
+📄 **[NeurIPS preprint (PDF)](assets/Park_2026_Leaner_Transformer.pdf)**
+
+Preliminary version:
+
+[![arXiv](https://img.shields.io/badge/arXiv-2510.09760-b31b1b.svg)](https://arxiv.org/abs/2610.09760)
 
 </div>
 
