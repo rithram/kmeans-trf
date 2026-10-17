@@ -1,11 +1,13 @@
 import torch
 import torch.nn.functional as F
+from entmax import sparsemax
 from torch.nn import Module
 
 torch.set_printoptions(precision=4)
 
 ADICT = {
     "softmax": F.softmax,
+    "sparsemax": sparsemax,
 }
 
 
@@ -70,13 +72,17 @@ if __name__ == "__main__":
     # kmeans obj upperbound via softmax
     sko = SoftKMObj(gamma=2)
     smobjs = sko(XX, CC)
+    # kmeans obj upperbound via sparsemax
+    sko2 = SoftKMObj(gamma=2, act="sparsemax", logloss=True)
+    smobjs2 = sko2(XX, CC)
     for i in range(bsz):
         diff = torch.sum(torch.abs(sqdist[i] - sqdist2[i]))
         kmobj = kmeans_obj(XX[i], CC[i])
         kmobjs += [kmobj]
         print(
             f"batch {i + 1} diff: {diff:.4f}, kmeans-obj: {kmobj:.4f}, "
-            f"softmin-kmeans-obj: {smobjs[i]:.4f}"
+            f"softmin-kmeans-obj: {smobjs[i]:.4f}, "
+            f"softmin-kmeans-obj-2 (log): {smobjs2[i]:.4f}"
         )
     kmobjs = torch.tensor(kmobjs)
     assert torch.all(kmobjs_batched == kmobjs), (
@@ -86,4 +92,7 @@ if __name__ == "__main__":
     )
     assert torch.all(kmobjs_batched <= smobjs), (
         f"True objs: {kmobjs_batched}\nSoftmin objs via softmax: {smobjs}"
+    )
+    assert torch.all(torch.log(kmobjs_batched) <= smobjs2), (
+        f"True objs: {kmobjs_batched}\nSoftmin objs via sparsemax: {smobjs2}"
     )
