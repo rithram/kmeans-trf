@@ -2,10 +2,9 @@ import time
 
 import numpy as np
 import torch
+from entmax import sparsemax
 
 torch.set_printoptions(precision=4)
-
-from entmax import sparsemax
 
 
 def lloyds_iters(

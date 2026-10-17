@@ -6,14 +6,13 @@ import os
 import time
 from itertools import product
 
-import numpy as np
-
-np.set_printoptions(precision=4)
-import pandas as pd
-
-pd.set_option("display.precision", 4)
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+np.set_printoptions(precision=4)
+pd.set_option("display.precision", 4)
 
 
 def label_gen(ename, rname, alt=False):

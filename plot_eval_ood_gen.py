@@ -8,27 +8,24 @@ import time
 from itertools import product
 from typing import cast
 
-import numpy as np
-
-np.set_printoptions(precision=4)
-import pandas as pd
-
-pd.set_option("display.precision", 4)
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import torch
 from matplotlib.axes import Axes
-
-torch.set_printoptions(precision=4)
 from torch.distributions.categorical import Categorical
-
-print(f"Cuda available: {torch.cuda.is_available()}")
-GPUE = torch.cuda.is_available()
 
 from ctasks import DMAP, ClusteringTasks
 from kmt import KModel
 from losses import kmeans_obj_batched
 from plot_train_id_gen import label_gen
 from utils import lloyds_iters_batched
+
+np.set_printoptions(precision=4)
+pd.set_option("display.precision", 4)
+torch.set_printoptions(precision=4)
+print(f"Cuda available: {torch.cuda.is_available()}")
+GPUE = torch.cuda.is_available()
 
 INIT_SCHEMES = [
     "random",

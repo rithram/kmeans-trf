@@ -1,8 +1,8 @@
 import torch
+import torch.nn.functional as F
 from torch.nn import Module
 
 torch.set_printoptions(precision=4)
-import torch.nn.functional as F
 
 ADICT = {
     "softmax": F.softmax,

@@ -4,28 +4,23 @@ import argparse
 import os
 import random
 
-import numpy as np
-from pandas import Index
-
-np.set_printoptions(precision=4)
-import pandas as pd
-
-pd.set_option("display.precision", 4)
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import torch
-
-torch.set_printoptions(precision=4)
+from pandas import Index
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-
-print(f"Cuda available: {torch.cuda.is_available()}")
 
 from ctasks import DMAP, ClusteringTasks
 from kmt import ATTDICT, KModel
 from losses import ADICT, SoftKMObj, kmeans_obj_batched
 from utils import lloyds_iters_batched
 
+np.set_printoptions(precision=4)
+pd.set_option("display.precision", 4)
 torch.set_printoptions(precision=2)
+print(f"Cuda available: {torch.cuda.is_available()}")
 
 
 def get_task_config(parser: argparse.ArgumentParser):
