@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
+import glob
 import os
 import time
-import sys
-import random
-import glob
 from itertools import product
 
 import numpy as np

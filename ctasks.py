@@ -1,11 +1,17 @@
 import random
+
 import numpy as np
-
 import torch
-from torch import nn
-from torch.distributions import Cauchy, Gumbel, Laplace, LogNormal, Normal
-from torch.distributions import Categorical, MixtureSameFamily, Distribution, Independent
-
+from torch.distributions import (
+    Categorical,
+    Cauchy,
+    Gumbel,
+    Independent,
+    Laplace,
+    LogNormal,
+    MixtureSameFamily,
+    Normal,
+)
 
 DMAP = {
     "normal": Normal,
@@ -100,7 +106,7 @@ class ClusteringTasks:
             maxX, _ = X.max(dim=0)
             X = X / maxX
             if torch.any(torch.isnan(X)):
-                print(f"[WARN] found nan in data, replacing with zero")
+                print("[WARN] found nan in data, replacing with zero")
                 X = torch.nan_to_num(X, nan=0.0)
             # permute samples, and select initial centers randomly
             X = X[torch.randperm(npoints)]

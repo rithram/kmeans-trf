@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import argparse
-import os
-import time
-import sys
-import random
 import glob
+import os
+import random
+import time
 from itertools import product
 from typing import cast
 
@@ -15,26 +14,21 @@ np.set_printoptions(precision=4)
 import pandas as pd
 
 pd.set_option("display.precision", 4)
-import matplotlib
 import matplotlib.pyplot as plt
+import torch
 from matplotlib.axes import Axes
 
-import torch
-
 torch.set_printoptions(precision=4)
-from torch import nn
 from torch.distributions.categorical import Categorical
 
 print(f"Cuda available: {torch.cuda.is_available()}")
 GPUE = torch.cuda.is_available()
 
-from utils import lloyds_iters_batched
-from losses import kmeans_obj_batched, ADICT
 from ctasks import DMAP, ClusteringTasks
-from kmt import ATTDICT, KMeansTransformer, KModel
-
+from kmt import KModel
+from losses import kmeans_obj_batched
 from plot_train_id_gen import label_gen
-
+from utils import lloyds_iters_batched
 
 INIT_SCHEMES = [
     "random",
@@ -181,7 +175,7 @@ def process_ood_task(
             )
             for seed, tasks in task_dict.items()
         }
-        print(f"Lloyd's iteration objectives computed")
+        print("Lloyd's iteration objectives computed")
         #   and report avg log-scaled-kmeans-objective
         yyy = torch.stack(
             [
@@ -193,12 +187,12 @@ def process_ood_task(
         yyub = torch.quantile(yyy, q=(1.0 - quantile), dim=0)
         yylb = torch.quantile(yyy, q=quantile, dim=0)
     else:
-        print(f"Using cached results for Lloyd's iteration")
+        print("Using cached results for Lloyd's iteration")
         yy, yylb, yyub = lloyds_res_cached
     assert xx.shape == yy.shape
     ax.plot(xx, yy, color="xkcd:almost black", linestyle="solid", label="Lloyd's", linewidth=1)
     ax.fill_between(xx, yylb, yyub, color="xkcd:almost black", alpha=0.2)
-    print(f"Lloyd's iteration objectives plotted:")
+    print("Lloyd's iteration objectives plotted:")
 
     # for all models in optdf, run model and plot results
     ret_list = []
@@ -484,7 +478,7 @@ if __name__ == "__main__":
             )
             for seed, id_val_tasks in id_val_task_dict.items()
         }
-        print(f"Lloyd's iteration objectives computed ...")
+        print("Lloyd's iteration objectives computed ...")
         xx = np.arange(0, args.niters + 1).astype(int)
         #   and report avg log-scaled-kmeans-objective across all seeds
         yyy = torch.stack(
@@ -502,7 +496,7 @@ if __name__ == "__main__":
                 xx, yy, color="xkcd:almost black", linestyle="solid", label="Lloyd's", linewidth=1
             )
             ax.fill_between(xx, yylb, yyub, color="xkcd:almost black", alpha=0.2)
-        print(f"Lloyd's iteration objectives plotted ...")
+        print("Lloyd's iteration objectives plotted ...")
 
         reset = [True] if args.skip_rembed_false else [False, True]
         mcolor_list = (
@@ -559,7 +553,7 @@ if __name__ == "__main__":
             msaxs[cidx].set_xlabel("# clustering steps", fontsize=10)
             if not args.alt_plot:
                 msaxs[cidx].set_title(f"Re-embed: {r}", fontsize=10)
-        msaxs[0].set_ylabel(f"avg log-kmeans-obj", fontsize=10)
+        msaxs[0].set_ylabel("avg log-kmeans-obj", fontsize=10)
         msaxs[-1].legend(
             ncol=args.nlegendcols,
             loc="best",
@@ -646,7 +640,7 @@ if __name__ == "__main__":
                 args.quantile,
             )
             axs[cidx].set_xlabel("# clustering steps", fontsize=10)
-        axs[0].set_ylabel(f"avg log-kmeans-obj", fontsize=10)
+        axs[0].set_ylabel("avg log-kmeans-obj", fontsize=10)
         axs[-1].legend(ncol=args.nlegendcols, loc="best", fontsize=8)
         add_grids_and_save(fig, axs, ofile)
 
@@ -701,7 +695,7 @@ if __name__ == "__main__":
             drows += [(dist, *dr) for dr in drow]
             axs[cidx].set_xlabel("# clustering steps", fontsize=10)
             print(f"Dist: {dist} completed")
-        axs[0].set_ylabel(f"avg log-kmeans-obj", fontsize=10)
+        axs[0].set_ylabel("avg log-kmeans-obj", fontsize=10)
         axs[-1].legend(ncol=args.nlegendcols, loc="best", fontsize=8)
         add_grids_and_save(fig, axs, ofile)
         print(pd.DataFrame(drows))

@@ -2,14 +2,15 @@
 Executable script to run a parameter sweep in parallel (CPU) using multiprocessing (via tqdm)
 """
 
-import numpy as np
-import multiprocessing as mp
-import torch
-from lloyds import lloyds_algorithm, kmeans_obj
-from cnst_model import CModel
-import pandas as pd
-from tqdm.contrib.concurrent import process_map
 import argparse
+
+import numpy as np
+import pandas as pd
+import torch
+from tqdm.contrib.concurrent import process_map
+
+from cnst_model import CModel
+from lloyds import kmeans_obj, lloyds_algorithm
 
 parser = argparse.ArgumentParser(
     "./klic_param_sweep.py",

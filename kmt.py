@@ -1,8 +1,9 @@
+import math
+
 import torch
-from torch import nn
 import torch.nn.functional as F
 from entmax import sparsemax
-import math
+from torch import nn
 
 ATTDICT = {
     "softmax": F.softmax,

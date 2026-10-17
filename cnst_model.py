@@ -1,8 +1,8 @@
 import torch
 
 torch.set_printoptions(precision=2)
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 
 class CModel(nn.Module):

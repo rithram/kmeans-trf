@@ -67,7 +67,7 @@ def lloyds_iters_batched(
         ccenters = ccenters.to("cuda")
     ltime = time.time()
     if torch.any(torch.isnan(ccenters)):
-        print(f"found nan in initial lloyds centers")
+        print("found nan in initial lloyds centers")
     for i in range(niters + 1):
         # compute points to center distance
         sqdist = torch.square(torch.cdist(X, ccenters))
@@ -228,8 +228,9 @@ if __name__ == "__main__":
     print("test ....")
     SEED = 153476998
     # Set seeds for experiment
-    import numpy as np
     import random
+
+    import numpy as np
 
     RNG = np.random.RandomState(SEED)
     torch.manual_seed(SEED)

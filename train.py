@@ -2,8 +2,6 @@
 
 import argparse
 import os
-import time
-import sys
 import random
 
 import numpy as np
@@ -14,19 +12,17 @@ import pandas as pd
 
 pd.set_option("display.precision", 4)
 import matplotlib.pyplot as plt
-
 import torch
 
 torch.set_printoptions(precision=4)
-from torch import nn
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 print(f"Cuda available: {torch.cuda.is_available()}")
 
-from losses import ADICT, kmeans_obj_batched, SoftKMObj
 from ctasks import DMAP, ClusteringTasks
-from kmt import ATTDICT, KMeansTransformer, KModel
+from kmt import ATTDICT, KModel
+from losses import ADICT, SoftKMObj, kmeans_obj_batched
 from utils import lloyds_iters_batched
 
 torch.set_printoptions(precision=2)
@@ -448,7 +444,7 @@ if __name__ == "__main__":
                 plot_current_stats(stats_df, set_names, fnames["plot"])
                 # save current chkpt of model if best
                 if save_best_chkpt:
-                    print(f"Saving current best checkpoint")
+                    print("Saving current best checkpoint")
                     torch.save(
                         {
                             **chkpt_dict,

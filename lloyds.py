@@ -1,5 +1,6 @@
-import torch
 import time
+
+import torch
 
 
 def kmeans_obj(samples, centers):
