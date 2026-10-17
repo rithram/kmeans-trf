@@ -41,7 +41,7 @@ def lloyds_algorithm(X, init_centers, niters, nclusters, ndims, use_cuda=False):
             torch.cat([torch.mean(X[cc == i], dim=0) for i in range(nclusters)]), (nclusters, ndims)
         )
         lloyd_centers += [curr_centers.clone().detach().to("cpu")]
-    # print(f"Lloyd's takes {time.time() - ltime:.3f} secs")
+    print(f"Lloyd's takes {time.time() - ltime:.3f} secs")
     lloyd_objs += [torch.log(kmeans_obj(X.to("cpu"), lloyd_centers[-1]))]
     # print("Lloyd's objs\n", lloyd_objs)
     return lloyd_centers, lloyd_objs, cc
