@@ -1,0 +1,10 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Linter cache
+.ruff_cache/
+
+# Training output and generated plots
+runs/
+*.pdf
