@@ -235,7 +235,6 @@ def add_grids_and_save(figobj, axes, out_file):
 
 
 def set_seed(SEED):
-    RNG = np.random.RandomState(SEED)
     torch.manual_seed(SEED)
     np.random.seed(SEED)
     random.seed(SEED)

@@ -114,7 +114,6 @@ def param_sweep(input_tuple):
                                 XX, CC = model(XX, CC)
                                 # track centers
                                 trf_centers += [CC[:, :dim].clone().detach().to("cpu")]
-                            YY = XX[:, -nc:].clone().detach().to("cpu").numpy().astype(int)
                         trf_objs = [torch.log(kmeans_obj(X.to("cpu"), cc)) for cc in trf_centers]
 
                         df["Clusters"].append(nc)

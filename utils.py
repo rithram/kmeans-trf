@@ -136,16 +136,6 @@ def trimmed_iters(
                 for i in range(nclusters)
             ]
         )
-        for i in range(nclusters):
-            if torch.sum(cassign == i) == 0:
-                continue
-            pidxs = torch.arange(nsamples, device=cassign.device)[cassign == i]
-            dists = sqd[pidxs]
-            inliers = dists < thres[i]
-            tpidxs = pidxs[inliers]
-            dpidxs = torch.arange(nsamples, device=cassign.device)[
-                (cassign == i) & (sqd < thres[i])
-            ]
         # compute new centers
         ccenters = torch.stack(
             [
