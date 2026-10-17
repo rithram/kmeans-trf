@@ -36,7 +36,7 @@ INIT_SCHEMES = [
 
 def gnzkpp(X, c, k, sample):
     clist = [c]
-    for i in range(k - 1):
+    for _ in range(k - 1):
         C = torch.stack(clist)
         sqdist = torch.square(torch.cdist(X, C))
         minsqdist, _ = sqdist.min(dim=1)
@@ -106,7 +106,7 @@ def process_model(
         BXX, BCC = get_scratch(
             batch_samples, batch_inits, cli_args["scratch"], ssize[cli_args["scratch"]]
         )
-        for i in range(niters):
+        for _ in range(niters):
             BXX, BCC = model(BXX, BCC)
             kmeans_obj += [kmeans_obj_batched(batch_samples, BCC[:, :, :ndims])]
             if reset:
@@ -134,7 +134,7 @@ def get_scratch(
         if scratch == "onehot":
             # one-hot encoding equivalent to an identity matrix
             return torch.eye(scratch_size)
-        assert False
+        raise AssertionError(f"Unsupported scratch encoding: {scratch}")
 
     if scratch == "none":
         XX = samples.clone().detach()

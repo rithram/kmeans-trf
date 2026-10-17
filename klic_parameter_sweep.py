@@ -110,7 +110,7 @@ def param_sweep(input_tuple):
                         model = CModel(dim, nc, temp, osa=True, ldp=True)
 
                         with torch.no_grad():
-                            for i in range(niters):
+                            for _ in range(niters):
                                 XX, CC = model(XX, CC)
                                 # track centers
                                 trf_centers += [CC[:, :dim].clone().detach().to("cpu")]

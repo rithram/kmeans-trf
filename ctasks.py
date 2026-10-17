@@ -56,7 +56,7 @@ class ClusteringTasks:
         n = random.choice(self.nlist)
         dist = random.choice(self.dists)
         XX, CC = [], []
-        for i in range(bsz):
+        for _ in range(bsz):
             # sample distribution to sample from in this task
             if not same_dist_batch:
                 dist = random.choice(self.dists)

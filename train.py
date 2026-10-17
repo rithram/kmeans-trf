@@ -345,8 +345,7 @@ if __name__ == "__main__":
         if args.scratch == "onehot":
             # one-hot encoding equivalent to an identity matrix
             return torch.eye(ssize[args.scratch])
-        assert False
-        return None
+        raise AssertionError(f"Unsupported scratch encoding: {args.scratch}")
 
     # initializing the kmeans transformer model
     model = KModel(
