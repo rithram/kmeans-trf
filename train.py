@@ -220,7 +220,7 @@ def plot_current_stats(sdf: pd.DataFrame, gnames: list[str], fname: str, hist_le
         "Validation loss (rel. to Lloyd's)",
     ]
     assert len(axs) == len(gnames)
-    for idx, (ax, gn) in enumerate(zip(axs, gnames)):
+    for idx, (ax, gn) in enumerate(zip(axs, gnames, strict=True)):
         gdf: pd.DataFrame = sdf[sdf["set"] == gn]  # type: ignore[assignment]
         xx: np.ndarray = gdf["step"].to_numpy()
         yy: np.ndarray | None = None
@@ -321,7 +321,7 @@ if __name__ == "__main__":
     # if GPUE:
     #   val_tasks = [ (X.to(DEVICE), C.to(DEVICE)) for (X, C) in val_tasks ]
     val_kmeans_obj = [lloyds_iters_batched(XX, CC, niters=1) for (XX, CC) in val_tasks]
-    for idx, (vt, kmobj) in enumerate(zip(val_tasks, val_kmeans_obj)):
+    for idx, (vt, kmobj) in enumerate(zip(val_tasks, val_kmeans_obj, strict=True)):
         print(f"Validation batch {idx + 1}: {vt[0].shape}, {vt[1].shape}")
         print(kmobj)
 
@@ -406,7 +406,10 @@ if __name__ == "__main__":
                 val_obj = torch.mean(torch.stack(model_kmeans_objs)).item()
                 rel_val_obj = torch.mean(
                     torch.stack(
-                        [torch.div(mm, vv[-1]) for mm, vv in zip(model_kmeans_objs, val_kmeans_obj)]
+                        [
+                            torch.div(mm, vv[-1])
+                            for mm, vv in zip(model_kmeans_objs, val_kmeans_obj, strict=True)
+                        ]
                     )
                 ).item()
                 if rel_val_obj < curr_best_val:

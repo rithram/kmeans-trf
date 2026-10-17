@@ -84,7 +84,7 @@ def lloyds_iters_batched(
                 f"[WARN] ({i + 1}/{niters}) found nan in lloyds centers, "
                 f"replacing with random points from the dataset"
             )
-            for bidx, (XX, CC) in enumerate(zip(X, ccenters)):
+            for bidx, (XX, CC) in enumerate(zip(X, ccenters, strict=True)):
                 if torch.any(torch.isnan(CC)):
                     print(f"[WARN] - found nan in task {bidx + 1}/{bsz}")
                     nancs = CC[torch.isnan(CC)]
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     niters = 5
     bret = lloyds_iters_batched(XX, CC, niters)
     # print(f"Batched return:\n{bret}")
-    for bidx, (X, C) in enumerate(zip(XX, CC)):
+    for bidx, (X, C) in enumerate(zip(XX, CC, strict=True)):
         print(f"Task {bidx + 1} ...")
         ret = lloyds_iters(X, C, niters)
         # print(f"[{bidx+1}] Ind return:\n{ret}")

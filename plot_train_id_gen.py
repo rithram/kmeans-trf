@@ -175,7 +175,7 @@ if __name__ == "__main__":
     assert len(vhps) == 2
     for vv in vhps:
         assert vv in sdict.keys(), f"HP: {vv} not found in\n{sdict.keys()}"
-    for sn, fn in zip(snames, rfiles):
+    for sn, fn in zip(snames, rfiles, strict=True):
         skip = False
         for k, v in sn:
             if k == "e":

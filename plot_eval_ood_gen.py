@@ -370,7 +370,7 @@ if __name__ == "__main__":
     for vv in vhps:
         assert vv in sdict.keys(), f"HP: {vv} not found in\n{sdict.keys()}"
     assert args.seed in sdict.keys(), f"Seed column not found in\n{sdict.keys()}"
-    for sn, fn in zip(snames, rfiles):
+    for sn, fn in zip(snames, rfiles, strict=True):
         for k, v in sn:
             sdict[k] += [v]
         sdict["fname"] += [fn]
@@ -414,12 +414,18 @@ if __name__ == "__main__":
                 args.opmode != opmodes[2]
                 or task_args["train_dists"] == tmp["cli_args"]["train_dists"]
             ):
-                assert all([torch.all(cvt[0] == vt[0]) for (cvt, vt) in zip(cvts, id_val_tasks)]), (
-                    f"File {rf} does not match"
-                )
-                assert all([torch.all(cvt[1] == vt[1]) for (cvt, vt) in zip(cvts, id_val_tasks)]), (
-                    f"File {rf} does not match"
-                )
+                assert all(
+                    [
+                        torch.all(cvt[0] == vt[0])
+                        for (cvt, vt) in zip(cvts, id_val_tasks, strict=True)
+                    ]
+                ), f"File {rf} does not match"
+                assert all(
+                    [
+                        torch.all(cvt[1] == vt[1])
+                        for (cvt, vt) in zip(cvts, id_val_tasks, strict=True)
+                    ]
+                ), f"File {rf} does not match"
             else:
                 pass
             for k, v in task_args.items():

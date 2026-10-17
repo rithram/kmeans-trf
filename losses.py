@@ -62,7 +62,7 @@ if __name__ == "__main__":
     bsz = 2
     XX = torch.rand(bsz, n, d)
     CC = torch.rand(bsz, k, d)
-    sqdist = [torch.square(torch.cdist(X, C)) for (X, C) in zip(XX, CC)]
+    sqdist = [torch.square(torch.cdist(X, C)) for (X, C) in zip(XX, CC, strict=True)]
     sqdist2 = torch.square(torch.cdist(XX, CC))
     kmobjs = []
     # True kmeans obj
