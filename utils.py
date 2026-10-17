@@ -257,4 +257,7 @@ if __name__ == "__main__":
         ret += [lloyds_iters(XX[i], CC[i], niters)]
     ret = torch.stack(ret).T
     ret2 = lloyds_iters_batched(XX, CC, niters)
-    assert torch.all(ret == ret2)
+    # per-task and batched sums accumulate in different orders, so allow float32 rounding error
+    assert torch.allclose(ret, ret2, rtol=1e-5, atol=0.0), (
+        f"per-task vs batched Lloyd's objectives differ, max abs diff: {(ret - ret2).abs().max()}"
+    )
