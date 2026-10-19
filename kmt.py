@@ -24,6 +24,9 @@ def scaled_dot_prod(
         -inv_temp * torch.square(torch.cdist(queries, keys)) / math.sqrt(keys.size(-1)), dim=-1
     )
     if dropout_p > 0:
+        # FIXME: F.dropout defaults to training=True, so this dropout is still active under
+        # model.eval() (the functional form ignores the module's mode). It needs to be
+        # deactivated during model.eval(), e.g., by passing the module's `self.training` here.
         attn = F.dropout(attn, p=dropout_p)
     attn_out = attn @ values
     return attn_out
