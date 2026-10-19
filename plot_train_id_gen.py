@@ -16,7 +16,11 @@ pd.set_option("display.precision", 4)
 
 
 def label_gen(ename, rname, alt=False):
-    edict = {"onehot": "demb=d+k" if alt else "OH", "none": "demb=d" if alt else "NA"}
+    edict = {
+        "onehot": "demb=d+k" if alt else "OH",
+        "binary": "demb=d+log(k)" if alt else "BN",
+        "none": "demb=d" if alt else "NA",
+    }
     rdict = {
         "softmax": "NE",
         "sparsemax": "L2",
