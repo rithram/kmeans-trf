@@ -17,7 +17,7 @@ from torch.distributions.categorical import Categorical
 
 from ctasks import DMAP, ClusteringTasks
 from kmt import KModel
-from losses import kmeans_obj_batched
+from losses import ADICT, kmeans_obj_batched
 from plot_train_id_gen import label_gen
 from utils import lloyds_iters_batched
 
@@ -86,6 +86,7 @@ def process_model(
     # load model
     ssize = {
         "onehot": nclusters,
+        "binary": np.ceil(np.log2(nclusters)).astype(int),
         "none": 0,
     }
     demb = ndims + ssize[cli_args["scratch"]]
@@ -134,6 +135,14 @@ def get_scratch(
         if scratch == "onehot":
             # one-hot encoding equivalent to an identity matrix
             return torch.eye(scratch_size)
+        elif scratch == "binary":
+            # each cluster gets the binary encoding of its index
+            ids = torch.arange(nclusters)
+            MM = []
+            for _ in range(scratch_size):
+                MM += [ids % 2]
+                ids = ids // 2
+            return torch.stack(MM).T
         raise AssertionError(f"Unsupported scratch encoding: {scratch}")
 
     if scratch == "none":
@@ -313,7 +322,14 @@ if __name__ == "__main__":
         help="Use logscale for x-axis",
         action="store_true",
     )
-    opmodes = ["mstep", "lengen", "varfam"]
+    parser.add_argument(
+        "-L",
+        "--lossact",
+        help="Loss activation of the models to evaluate (for OOD opmodes)",
+        choices=ADICT.keys(),
+        default="softmax",
+    )
+    opmodes = ["mstep", "lengen", "varfam", "vardist", "crossfam"]
     parser.add_argument(
         "--opmode",
         choices=opmodes,
@@ -377,6 +393,13 @@ if __name__ == "__main__":
     for vv in vhps:
         print(f"Unique values for var HP {vv}:{sdf[vv].unique()}")
 
+    if args.opmode == "crossfam":
+        assert len(sdf["D"].unique()) > 1, (
+            f"Need more than 1 distribution for opmode=crossfam, got\n{sdf['D'].unique()}"
+        )
+
+    # opmodes that evaluate models trained on different distribution families
+    mixed_train_dists = args.opmode in ("varfam", "crossfam")
     sdf[args.seed] = pd.to_numeric(sdf[args.seed])
     print(sdf[args.seed].unique())
     # Check if all have the same set of validation tasks
@@ -409,10 +432,7 @@ if __name__ == "__main__":
             tmp = torch.load(rf)
             cvts = tmp["val_tasks"]
             assert len(cvts) == len(id_val_tasks)
-            if (
-                args.opmode != opmodes[2]
-                or task_args["train_dists"] == tmp["cli_args"]["train_dists"]
-            ):
+            if not mixed_train_dists or task_args["train_dists"] == tmp["cli_args"]["train_dists"]:
                 assert all(
                     [
                         torch.all(cvt[0] == vt[0])
@@ -428,7 +448,7 @@ if __name__ == "__main__":
             else:
                 pass
             for k, v in task_args.items():
-                if k == "train_dists" and args.opmode == opmodes[2]:
+                if k == "train_dists" and mixed_train_dists:
                     continue
                 assert tmp["cli_args"][k] == v, (
                     f"file: {rf}, cli-arg: {k}, value {v} vs {tmp['cli_args'][k]}"
@@ -445,7 +465,7 @@ if __name__ == "__main__":
 
     tmp_dict = {k: seed_lloyds(v, args.init_scheme) for k, v in id_val_task_dict.items()}
     id_val_task_dict = tmp_dict
-    lossact = "softmax"
+    lossact = args.lossact
     ofile = os.path.join(
         args.outdir, f"{args.prefix}_iters{args.niters}_{lossact}_{args.opmode}_{dstr}.pdf"
     )
@@ -454,7 +474,7 @@ if __name__ == "__main__":
     mult = args.size_multiplier
 
     # multi-step evaluation
-    if args.opmode == opmodes[0]:
+    if args.opmode == "mstep":
         nrows = 1
         ncols = 1 if args.skip_rembed_false else 2
         fig, msaxs = plt.subplots(
@@ -591,7 +611,7 @@ if __name__ == "__main__":
     SEEDS = id_val_task_dict.keys()
 
     # - out of distribution in terms of the number of samples to cluster
-    if args.opmode == opmodes[1]:
+    if args.opmode == "lengen":
         fig, axs = plt.subplots(
             1,
             4,
@@ -646,8 +666,134 @@ if __name__ == "__main__":
         axs[-1].legend(ncol=args.nlegendcols, loc="best", fontsize=8)
         add_grids_and_save(fig, axs, ofile)
 
+    # - eq-mix em=False / eq-scale es=False / scale changes
+    if args.opmode == "vardist":
+        fig, axs = plt.subplots(
+            1,
+            4,
+            figsize=(4 * mult, mult),
+            sharex=True,
+            sharey=("row" if args.sharey else False),
+        )
+        print("=" * 60)
+        print("Processing out-of-distribution tasks -- distribution scale + mix")
+        print("-" * 60)
+        scales = [
+            task_args["scale"],
+            task_args["scale"],
+            0.5 * task_args["scale"],
+            2.0 * task_args["scale"],
+        ]
+        eqmixes = [
+            not task_args["em"],
+            task_args["em"],
+            task_args["em"],
+            task_args["em"],
+        ]
+        eqscales = [
+            task_args["es"],
+            not task_args["es"],
+            task_args["es"],
+            task_args["es"],
+        ]
+        titles = [
+            f"equal-mix: {not task_args['em']}",
+            f"equal-scale: {not task_args['es']}",
+            f"scale: 0.5*{task_args['scale']}",
+            f"scale: 2.0*{task_args['scale']}",
+        ]
+        for cidx, (em, es, sc, title) in enumerate(
+            zip(eqmixes, eqscales, scales, titles, strict=True)
+        ):
+            # Instantiate task generator and obtain validation set
+            ood_val_task_dict = {}
+            for seed in SEEDS:
+                set_seed(seed)
+                task_gen = ClusteringTasks(
+                    task_args["nclusters"],
+                    task_args["nclusters"],
+                    task_args["ndims"],
+                    task_args["nlb"],
+                    task_args["nub"],
+                    [d for d in task_args["train_dists"].split("+")],
+                    scale=sc,
+                    equal_mix=em,
+                    equal_scales=es,
+                )
+                ood_val_task_dict[seed] = [
+                    task_gen.sample_batch(task_args["bsz"], same_dist_batch=task_args["sdb"])
+                    for _ in range(task_args["val_nbatches"])
+                ]
+            axs[cidx].set_title(f"{title}")
+            _ = process_ood_task(
+                ood_val_task_dict,
+                args.niters,
+                axs[cidx],
+                optdf,
+                color_dict,
+                vhps[0],
+                lossact,
+                args.seed,
+                reset,
+                args.quantile,
+            )
+            axs[cidx].set_xlabel("# clustering steps", fontsize=10)
+        axs[0].set_ylabel("avg log-kmeans-obj", fontsize=10)
+        axs[-1].legend(ncol=args.nlegendcols, loc="best", fontsize=8)
+        add_grids_and_save(fig, axs, ofile)
+
+    # - models trained on one distribution family, evaluated on every family
+    if args.opmode == "crossfam":
+        dists = np.sort(optdf["D"].unique())
+        ndists = len(dists)
+        print(dists, ndists)
+        fig, axs = plt.subplots(
+            ndists,
+            ndists,
+            figsize=(ndists * mult, ndists * mult),
+            sharex=True,
+            sharey=("row" if args.sharey else False),
+        )
+        print("=" * 60)
+        print("Processing out-of-distribution tasks -- cross distribution family")
+        print("-" * 60)
+        for ridx, (dist, distdf) in enumerate(optdf.groupby("D")):
+            print(f"validation data from {dist} ...")
+            task_dict = {}
+            for seed, sddf in distdf.groupby(args.seed):
+                task_dict[int(cast(int, seed))] = torch.load(sddf["fname"].values[0])["val_tasks"]
+            print(f" .... considering seeds: {task_dict.keys()}")
+            llres_cached = None
+            for cidx, (dd, dddf) in enumerate(optdf.groupby("D")):
+                print(f"model trained on {dd} ...")
+                axs[ridx, cidx].set_title(
+                    f"{str(dist).replace('lognormal', 'lognorm')}/"
+                    f"{str(dd).replace('lognormal', 'lognorm')}"
+                )
+                # Lloyd's results only depend on the validation tasks (row), so cache per row
+                llres_cached, _ = process_ood_task(
+                    task_dict,
+                    args.niters,
+                    axs[ridx, cidx],
+                    dddf,
+                    color_dict,
+                    vhps[0],
+                    lossact,
+                    args.seed,
+                    reset,
+                    args.quantile,
+                    lloyds_res_cached=llres_cached,
+                )
+                print(f"... {dist}/{dd} done")
+            print(f" ... {dist} validation eval done completely")
+            axs[ridx, 0].set_ylabel("avg log-kmeans-obj", fontsize=10)
+        for cidx in range(ndists):
+            axs[-1, cidx].set_xlabel("# clustering steps", fontsize=10)
+        axs[-1, -1].legend(ncol=1, loc="best", fontsize=8)
+        add_grids_and_save(fig, axs, ofile)
+
     # - Distribution changes cauchy/gumbel/laplace/lognormal
-    if args.opmode == opmodes[2]:
+    if args.opmode == "varfam":
         dists = DMAP.keys()
         fig, axs = plt.subplots(
             1,
