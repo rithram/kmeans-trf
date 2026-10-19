@@ -66,6 +66,10 @@ class KMeansTransformer(nn.Module):
         V = self.W_v(keys_values_in)
 
         attn = scaled_dot_prod(Q, K, V, self.inv_temp, self.dropout_p, self.act)
+        # FIXME: this assertion only holds when d_qkv == d_emb. For d_qkv != d_emb (e.g.,
+        # --dqkv 2 in train.py, which sets d_qkv = dqkv * d_emb) attn has width d_qkv, so the
+        # assertion fails, and the residual connections in KModel.forward would also need an
+        # output projection from d_qkv back to d_emb. Only --dqkv 1 currently works.
         assert attn.shape == queries_in.shape
         return attn
 
