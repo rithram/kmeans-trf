@@ -86,7 +86,7 @@ def validate_task_config(args: argparse.Namespace):
 
 
 def get_arch_config(parser: argparse.ArgumentParser):
-    enc_choices = ["onehot", "none"]
+    enc_choices = ["onehot", "binary", "none"]
     parser.add_argument(
         "-e", "--scratch", help="Form of scratch space", choices=enc_choices, default=enc_choices[0]
     )
@@ -334,6 +334,7 @@ if __name__ == "__main__":
     # set up transformer models
     ssize = {
         "onehot": args.nclusters,
+        "binary": np.ceil(np.log2(args.nclusters)).astype(int),
         "none": 0,
     }
     demb = args.ndims + ssize[args.scratch]
@@ -345,6 +346,14 @@ if __name__ == "__main__":
         if args.scratch == "onehot":
             # one-hot encoding equivalent to an identity matrix
             return torch.eye(ssize[args.scratch])
+        elif args.scratch == "binary":
+            # each cluster gets the binary encoding of its index
+            ids = torch.arange(args.nclusters)
+            MM = []
+            for _ in range(ssize[args.scratch]):
+                MM += [ids % 2]
+                ids = ids // 2
+            return torch.stack(MM).T
         raise AssertionError(f"Unsupported scratch encoding: {args.scratch}")
 
     # initializing the kmeans transformer model
