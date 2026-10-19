@@ -110,7 +110,7 @@ The details on running the scripts for the training and evaluation is in [expts.
 
 <div align="center">
 
-📄 **[NeurIPS preprint (PDF)](assets/Park_2026_Leaner_Transformer.pdf)**
+📄 **[NeurIPS camera-ready (PDF)](assets/Park_2026_Leaner_Transformer.pdf)**
 
 Preliminary version:
 
