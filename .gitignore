@@ -8,3 +8,6 @@ __pycache__/
 # Training output and generated plots
 runs/
 *.pdf
+
+# Scratch space for test runs
+tmp/
