@@ -3,6 +3,7 @@
 import argparse
 import os
 import random
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -241,6 +242,17 @@ def plot_current_stats(sdf: pd.DataFrame, gnames: list[str], fname: str, hist_le
     plt.close()
 
 
+def is_training_complete(stats_file: str, chkpt_file: str, nsteps: int) -> bool:
+    """A run is complete if its last checkpoint exists and its stats CSV reaches step nsteps."""
+    if not (os.path.exists(stats_file) and os.path.exists(chkpt_file)):
+        return False
+    try:
+        sdf = pd.read_csv(stats_file)
+    except ValueError:  # empty or truncated CSV (e.g., run killed mid-write)
+        return False
+    return "step" in sdf.columns and len(sdf) > 0 and int(sdf["step"].max()) >= nsteps
+
+
 if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
@@ -284,7 +296,19 @@ if __name__ == "__main__":
             "chkpt_last": os.path.join(args.odir, f"{nstr}_last.pt"),
             "chkpt_best": os.path.join(args.odir, f"{nstr}_best.pt"),
         }
-        assert all([not os.path.exists(v) for k, v in fnames.items()])
+        if is_training_complete(fnames["stats"], fnames["chkpt_last"], args.nsteps):
+            print(
+                f"Config already trained ({args.nsteps} steps): found {fnames['chkpt_last']} "
+                f"and {fnames['stats']}.\n"
+                "Rerunning requires a new --odir or deleting these files."
+            )
+            sys.exit(0)
+        # existing files from an unfinished run are not skipped
+        assert all([not os.path.exists(v) for k, v in fnames.items()]), (
+            "Output files from an incomplete run exist (training did not reach "
+            f"{args.nsteps} steps). Delete them or use a new --odir:\n"
+            + "\n".join(v for v in fnames.values() if os.path.exists(v))
+        )
         print(f"Saving following:\n{fnames}")
         chkpt_dict["fnames"] = fnames
         chkpt_dict["cli_args"] = args.__dict__
