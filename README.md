@@ -80,7 +80,7 @@ Although transformers are most commonly optimized as statistical sequence models
 
 #### Experimental details
 
-The details on running the scripts for the training and evaluation is in [expts.md](./expts.md).
+The details on running the scripts for the training and evaluation is in [expts-icml-26.md](./expts-icml-26.md).
 
 ### Citing this work
 
@@ -121,3 +121,7 @@ Preliminary version:
 **Abstract.**
 Transformers have in-context learning capabilities, where some known learning algorithms can be executed in the forward pass through the model. Recent work shows that transformers can exactly perform Lloyd's algorithm for $k$-means clustering with $n$ points in $d$ dimensions with an embedding size $d_{\textsf{emb}} = d+k$ (thus, requiring attention projection matrices of size $(d+k)^2$). In this work, we build upon this result in the following ways: First, we present an equally expressive but smaller transformer that executes Lloyd's algorithm with embedding size $d_{\textsf{emb}} = (d + \lceil\log_2 k\rceil)$. Next, we train these transformers to learn the clustering algorithms given a distribution of clustering tasks, and theoretically characterize and empirically validate the factors affecting the convergence and in-distribution generalization of learning algorithms based on stochastic gradients.
 Finally, we probe the general clustering abilities of these learned algorithms (in the form of transformers), and try to understand situations where they succeed and fail.
+
+#### Experimental details
+
+The details on running the scripts for the training, evaluation and profiling is in [expts-neurips-26.md](./expts-neurips-26.md).
