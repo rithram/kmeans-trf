@@ -211,7 +211,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "Loss temp" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig9a" \
   --quantile 25 \
@@ -233,7 +233,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "Loss temp" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig9b" \
   --quantile 25 \
@@ -257,7 +257,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "nclusters" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig10a" \
   --quantile 25 \
@@ -279,7 +279,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "ndims" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig10b" \
   --quantile 25 \

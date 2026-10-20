@@ -239,11 +239,10 @@ if __name__ == "__main__":
     print(f"saving file in {ofile}")
 
     mult = args.size_multiplier
-    n_cols = len(sdf[args.split_hp].unique())
     fig, axs = plt.subplots(
         2,
-        n_cols,
-        figsize=(1.25 * mult * n_cols, 1.75 * mult * 2),
+        len(sdf[args.split_hp].unique()),
+        figsize=(2.5 * mult, 1.75 * mult),
         sharex=True,
         sharey=("row" if args.sharey else False),
     )
