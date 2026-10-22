@@ -1,6 +1,6 @@
-# Experimental Replication Guide
+# Experimental Replication Guide (ICML 2026 Submission)
 
-This document provides all commands needed to replicate the experiments from the paper. All commands are ready to copy-paste and execute.
+This document is specific to the ICML 2026 submission. It provides all commands needed to replicate the experiments from that paper. All commands are ready to copy-paste and execute.
 
 ## Prerequisites
 
@@ -49,6 +49,14 @@ All training runs use the `expt-run.sh` script with the following parameters:
 140439608, 145017219, 162518970, 245293503, 152674004
 ```
 
+**Verifying a command before running it:** `expt-run.sh` only executes the training when `--run` is given. Without `--run`, it prints the exact `python train.py ...` commands it would execute (one per scratch encoding) and exits, so you can check the arguments, the seed, and the output directory first. For example:
+```bash
+ENVNAME="kmt"; N=512; D=32; K=10; LR=0.01; LI=10.0; T=10000; TRIAL=1
+bash expt-run.sh ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}          # prints only
+bash expt-run.sh --run ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}    # trains
+```
+Run `bash expt-run.sh --help` for all options.
+
 ### Figure 9 - Loss Temperature Experiments
 
 Train models with varying loss inverse-temperatures ($\lambda^{-1}$ = 1.0, 4.0, 7.0, 10.0) across dimensions 4 and 32:
@@ -57,7 +65,7 @@ Train models with varying loss inverse-temperatures ($\lambda^{-1}$ = 1.0, 4.0, 
 for TRIAL in {1..10}; do
   for D in 4 32; do
     for LI in 1.0 4.0 7.0 10.0; do
-      ENVNAME="kmt"; N=512; K=6; LR=0.01; T=10000; bash expt-run.sh ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}
+      ENVNAME="kmt"; N=512; K=6; LR=0.01; T=10000; bash expt-run.sh --run ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}
     done
   done
 done
@@ -70,7 +78,7 @@ Train models with varying numbers of clusters (K = 10, 16, 25):
 ```bash
 for TRIAL in {1..10}; do
   for K in 10 16 25; do
-    ENVNAME="kmt"; N=512; D=32; LI=10.0; LR=0.01; T=10000; bash expt-run.sh ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}
+    ENVNAME="kmt"; N=512; D=32; LI=10.0; LR=0.01; T=10000; bash expt-run.sh --run ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}
   done
 done
 ```
@@ -82,7 +90,7 @@ Train models with varying dimensions (D = 8, 16):
 ```bash
 for TRIAL in {1..10}; do
   for D in 8 16; do
-    ENVNAME="kmt"; N=512; LI=10.0; K=6; LR=0.01; T=10000; bash expt-run.sh ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}
+    ENVNAME="kmt"; N=512; LI=10.0; K=6; LR=0.01; T=10000; bash expt-run.sh --run ${N} ${D} ${K} ${LR} ${LI} ${T} ${TRIAL} ${ENVNAME}
   done
 done
 ```
@@ -153,7 +161,7 @@ python plot_eval_ood_gen.py \
   --opmode mstep \
   --nlegendcols 1 \
   --seed 'E' \
-  --init_scheme kmeams++ \
+  --init_scheme kmeans++ \
   --quantile 0 \
   --skip_rembed_false \
   --alt_plot
@@ -203,7 +211,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "Loss temp" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig9a" \
   --quantile 25 \
@@ -225,7 +233,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "Loss temp" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig9b" \
   --quantile 25 \
@@ -249,7 +257,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "nclusters" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig10a" \
   --quantile 25 \
@@ -271,7 +279,7 @@ python plot_train_id_gen.py \
   -V "e:L" \
   --numeric \
   -T "ndims" \
-  -M 1.5 \
+  -M 3.0 \
   --logy \
   -C "fig10b" \
   --quantile 25 \
